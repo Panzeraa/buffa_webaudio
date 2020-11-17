@@ -25,6 +25,15 @@ template.innerHTML = `
     cursor: pointer;
   }
 
+  .div_general {
+    box-shadow: 0px 0px 20px black;
+  width: 300px;
+  background-color: #000000;
+  background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
+  padding: 2em;
+  border-radius: 15px;
+  }
+
   .btn_custom_active {
     height: 3em;
     width: 3em;
@@ -92,17 +101,44 @@ template.innerHTML = `
     color: #bdbdbd;
     border: 1px #696969 solid;
   }
+
+  .slider {
+    margin: 10px 0;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    border-radius: 5px;  
+    background: #d3d3d3;
+    outline: none;
+    opacity: 1;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    cursor: pointer;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%; 
+    background: #FFFFFF;
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    cursor: pointer;
+  }
 </style>
-<div id="div_general" style="box-shadow: 0px 0px 20px black;
-  width: 300px;
-  background-color: #000000;
-  background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
-  padding: 2em;
-  border-radius: 15px;">
+<div id="div_general" class="div_general" style="">
   <div id="visualizerPanel" style="display: flex; flex-direction: column; justify-content: center;">
     <div id="titleSound" class="titleSound"></div>
     <!--<progress style="width: 100%;" id="progress" min=0 max=100 step=1 value=0></progress>-->
-    <input type="range" style="width: 100%;" id="progress" min=0 max=100 step=1 value=0>
+    <input class="slider" type="range" style="width: 100%;" id="progress" min=0 max=100 step=1 value=0>
     <div style="display: flex; justify-content: flex-end;color:white; font-family: sans-serif; font-size: 12px;">
       <div id="currentDuration">0:00</div>/<div id="totalDuration">0:00</div>
     </div>
@@ -124,14 +160,14 @@ template.innerHTML = `
     </webaudio-switch>-->
 
   </div>
-  <div id="secondcontrolPanel" style="display: flex; justify-content: space-around;">
-    <webaudio-knob id="knobVueMeter" src="./assets/imgs/Vintage_VUMeter_2.png" sprites="50" value=0 min="0" max="100"
+  <div id="secondcontrolPanel" style="display: flex; justify-content: space-around; align-items: center;">
+    <webaudio-knob style="cursor:default" id="knobVueMeter" src="./assets/imgs/Realistic-Vu.png" sprites="98" width="90" height="60" value=0 min="0" max="100"
       step=1>
     </webaudio-knob>
-    <webaudio-knob id="knobVolume" tooltip="Volume:%s" src="./assets/imgs/bouton3.png" sprites="29" value=0 min="0"
+    <webaudio-knob id="knobVolume" tooltip="Volume:%s" src="./assets/imgs/bouton3.png" sprites="29" value="0" defvalue="0"  min="0"
       max="1" step=0.01>
     </webaudio-knob>
-    <webaudio-knob id="knobPan" tooltip="Pan:%s" src="./assets/imgs/bouton2.png" sprites="127" value=0 min="-1" max="1"
+    <webaudio-knob id="knobPan" tooltip="Pan:%s" src="./assets/imgs/bouton2.png" width="70" height="80" sprites="127" value="0" defvalue="0" min="-1" max="1"
       step=0.01>
     </webaudio-knob>
   </div>
@@ -205,15 +241,19 @@ class MyAudioPlayer extends HTMLElement {
   }
   attributeChangedCallback(attr, oldV, newV) { // MVC
     // sera appelé par ex. lors d’un this.setAttribute(’volume’, val);
-    switch (attr) {
-      case 'volume':
-        this.setControlledVolume(newV);
-        break;
-      case 'pan':
-        this.setControlledPan(newV);
-      default:
-      // console.log("Non reconnu");
+    // console.log("changement" + oldV)
+    if(oldV != null){
+      switch (attr) {
+        case 'volume':
+          this.setControlledVolume(newV);
+          break;
+        case 'pan':
+          this.setControlledPan(newV);
+        default:
+        // console.log("Non reconnu");
+      }
     }
+    
     // console.log(attr + " - " + oldV + " - " + newV)
   }
 
@@ -238,6 +278,7 @@ class MyAudioPlayer extends HTMLElement {
     }
     if (this.getAttribute('volume') != null) {
       this.volume = this.getAttribute('volume');
+      console.log("volume : " + this.volume)
     }
     if (this.getAttribute('pan') != null) {
       this.pan = this.getAttribute('pan');
@@ -354,10 +395,12 @@ class MyAudioPlayer extends HTMLElement {
   }
 
   initViewers() {
+    console.log(this.volume)
+    console.log(this.pan)
     this.shadowRoot.querySelector("#knobVolume").value = this.volume;
+    this.shadowRoot.querySelector("#knobPan").value = this.pan;
     this.shadowRoot.querySelector("#totalDuration").textContent = this.secondToMinute(this.player.duration);
     this.shadowRoot.querySelector("#loopButton").className = !this.loopBool ? "btn_custom" : "btn_custom_active";
-    console.log(new URL(this.srcString));
     this.shadowRoot.querySelector("#titleSound").textContent = this.srcString.split("/")[this.srcString.split("/").length - 1];
   }
 
@@ -496,6 +539,7 @@ class MyAudioPlayer extends HTMLElement {
     //   document.querySelector("#div_general").style.background-color = "#000000";
     // }
     // console.log(this.dataArray)
+    this.shadowRoot.querySelector("#div_general").setAttribute('style', 'background-color:rgb('+vol+', 0, 0);');
     requestAnimationFrame(() => { this.visualizeVueMeter() });
   }
 
@@ -529,7 +573,7 @@ class MyAudioPlayer extends HTMLElement {
       barHeight = this.dataArray[i];
 
       // The color is red but lighter or darker depending on the value
-      this.canvasContextFreq.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
+      this.canvasContextFreq.fillStyle = 'rgb(' + (barHeight + 100) + ',' + (230 - barHeight) + ',' + 50 + ')';
       // scale from [0, 255] to the canvas height [0, height] pixels
       barHeight *= heightScale;
       // draw the bar
