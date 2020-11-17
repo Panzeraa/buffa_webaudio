@@ -1,0 +1,28 @@
+<html lang="fr">
+    <!-- https://tombless-rack.000webhostapp.com/ -->
+<head>
+    <meta charset="utf-8">
+    <title>Exemple lecteur multimedia</title>
+    <script type="module" src="./myComponents/index.js"></script>
+</head>
+
+<body>
+    <div style="display: flex;">
+        <my-audioplayer style="margin: 20px;" id="myA" src="https://mainline.i3s.unice.fr/mooc/guitarRiff1.mp3" volume="0.5" pan="0">
+        </my-audioplayer>
+        <my-audioplayer style="margin: 20px;" id="myA2" src="http://mainline.i3s.unice.fr/multitrack/Back_In_Black/Backing vocals.mp3"
+            volume="0.5" pan="0"></my-audioplayer>
+    </div>
+    <!-- <my-audioplayer src="http://mainline.i3s.unice.fr/multitrack/Back_In_Black/Backing vocals.mp3"></my-audioplayer> -->
+</body>
+
+<script>
+    window.onload = () => {
+        setInterval(function () {
+            document.getElementById("myA").setAttribute("volume", Math.random())
+            document.getElementById("myA").setAttribute("pan", Math.random() * 2 - 1)
+        }, 3000);
+    }
+</script>
+
+</html>

@@ -1,0 +1,186 @@
+<style>
+  H1 {
+    color: red;
+  }
+
+  .btn_custom {
+    height: 3em;
+    width: 3em;
+    border-radius: 20px;
+    background: rgb(152, 152, 152);
+    background: linear-gradient(333deg, rgba(152, 152, 152, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    color: black;
+    margin: 7px;
+    cursor: pointer;
+  }
+
+  .btn_custom_active {
+    height: 3em;
+    width: 3em;
+    border-radius: 20px;
+    background: rgb(113, 113, 113);
+    background: linear-gradient(333deg, rgba(113, 113, 113, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    color: gray;
+    margin: 7px;
+    cursor: pointer;
+    border-style: inset;
+  }
+
+  .btn_custom:active {
+    background: rgb(113, 113, 113);
+    background: linear-gradient(333deg, rgba(113, 113, 113, 1) 0%, rgba(255, 255, 255, 1) 100%);
+  }
+
+  .btn_custom:focus {
+    outline: none !important;
+  }
+
+  .btn_custom_active:focus {
+    outline: none !important;
+  }
+
+  .titleSound {
+    font-size: 24px;
+    font-weight: bold;
+    font-family: sans-serif;
+    overflow-x: auto;
+    color: white;
+  }
+
+  .titleSound::-webkit-scrollbar {
+    display: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .canvas_viewer {
+    border: 1px solid black;
+    border-radius: 15px;
+    width: 300px;
+    transition: all 0.5s ease;
+    transform: scaleX(1);
+    transform-origin: center;
+  }
+
+  .canvas_hide {
+    transform: scaleX(0);
+    width: 0px;
+  }
+
+  .label_hz {
+    width: 35px;
+    text-align: center;
+    font-size: 12px;
+    background: #ffffff21;
+    padding: 2px;
+    border-radius: 3px;
+    color: #bdbdbd;
+    border: 1px #696969 solid;
+  }
+</style>
+<div id="div_general" style="box-shadow: 0px 0px 20px black;
+  width: 300px;
+  background-color: #000000;
+  background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
+  padding: 2em;
+  border-radius: 15px;">
+  <div id="visualizerPanel" style="display: flex; flex-direction: column; justify-content: center;">
+    <div id="titleSound" class="titleSound"></div>
+    <progress style="width: 100%;" id="progress" min=0 max=100 step=1 value=0></progress>
+    <div style="display: flex; justify-content: flex-end;color:white; font-family: sans-serif; font-size: 12px;">
+      <div id="currentDuration">0:00</div>/<div id="totalDuration">0:00</div>
+    </div>
+  </div>
+  <div id="firstcontrolPanel" style="display: flex; justify-content: center;">
+    <audio id="myPlayer" crossorigin>
+      <source src="https://mainline.i3s.unice.fr/mooc/guitarRiff1.mp3" type="audio/mp3" />
+    </audio>
+    <button id="stopButton" class="btn_custom">◀◀</button>
+    <button id="playButton" class="btn_custom">▶</button>
+    <button id="loopButton" class="btn_custom">
+      <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-clockwise" fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+      </svg>
+    </button>
+    <!--<webaudio-switch id="knobLoop" width="38" height="11" src="./assets/imgs/ST_button_Loop_38x11_6f.png">
+    </webaudio-switch>-->
+
+  </div>
+  <div id="secondcontrolPanel" style="display: flex; justify-content: space-around;">
+    <webaudio-knob id="knobVueMeter" src="./assets/imgs/Vintage_VUMeter_2.png" sprites="50" value=0 min="0" max="100"
+      step=1>
+    </webaudio-knob>
+    <webaudio-knob id="knobVolume" tooltip="Volume:%s" src="./assets/imgs/bouton3.png" sprites="29" value=0 min="0"
+      max="1" step=0.01>
+    </webaudio-knob>
+    <webaudio-knob id="knobPan" tooltip="Pan:%s" src="./assets/imgs/bouton2.png" sprites="127" value=0 min="-1" max="1"
+      step=0.01>
+    </webaudio-knob>
+  </div>
+  <div style="width: 100%;
+  display: flex;
+  justify-content: center;">
+    <webaudio-switch style="transform: rotate(90deg);" id="knobSwitchView" src="./assets/imgs/switch_toggle.png"
+      value="1" sprites="2" width="50" height="50">
+    </webaudio-switch>
+  </div>
+  <div style="display: flex;
+  height: 100px;
+  margin: 0 0 10px 0;">
+    <canvas id="myCanvasWaveShape" class="canvas_viewer" width=300 height=100></canvas>
+
+    <canvas id="myCanvasFrequency" class="canvas_viewer canvas_hide" width=300 height=100></canvas>
+  </div>
+  <div style="display: flex;
+  color: lightgray;
+  font-family: system-ui;">
+    <div class="controls">
+
+      <webaudio-knob id="inputgain0" src="./assets/imgs/slider_knobman2.png" width="50" height="128" sprites="30"
+        value=0 min="-30" max="30" step=1 tooltip="%s DB"></webaudio-knob>
+      <label class="label_hz">60</label>
+      <!-- <output id="gain0">0 dB</output> -->
+    </div>
+    <div class="controls">
+
+      <webaudio-knob id="inputgain1" src="./assets/imgs/slider_knobman2.png" width="50" height="128" sprites="30"
+        value=0 min="-30" max="30" step=1 tooltip="%sDB"></webaudio-knob>
+      <label class="label_hz">170</label>
+      <!-- <output id="gain1">0 dB</output> -->
+    </div>
+    <div class="controls">
+
+      <webaudio-knob id="inputgain2" src="./assets/imgs/slider_knobman2.png" width="50" height="128" sprites="30"
+        value=0 min="-30" max="30" step=1 tooltip="%sDB"></webaudio-knob>
+      <label class="label_hz">350</label>
+      <!-- <output id="gain2">0 dB</output> -->
+    </div>
+    <div class="controls">
+
+      <webaudio-knob id="inputgain3" src="./assets/imgs/slider_knobman2.png" width="50" height="128" sprites="30"
+        value=0 min="-30" max="30" step=1 tooltip="%sDB"></webaudio-knob>
+      <label class="label_hz">1000</label>
+      <!-- <output id="gain3">0 dB</output> -->
+    </div>
+    <div class="controls">
+
+      <webaudio-knob id="inputgain4" src="./assets/imgs/slider_knobman2.png" width="50" height="128" sprites="30"
+        value=0 min="-30" max="30" step=1 tooltip="%sDB"></webaudio-knob>
+      <label class="label_hz">3500</label>
+      <!-- <output id="gain4">0 dB</output> -->
+    </div>
+    <div class="controls">
+
+      <webaudio-knob id="inputgain5" src="./assets/imgs/slider_knobman2.png" width="50" height="128" sprites="30"
+        value=0 min="-30" max="30" step=1 tooltip="%sDB"></webaudio-knob>
+      <label class="label_hz">10000</label>
+      <!-- <output id="gain5">0 dB</output> -->
+    </div>
+  </div>
+</div>
