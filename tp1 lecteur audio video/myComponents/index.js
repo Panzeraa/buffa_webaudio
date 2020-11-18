@@ -397,8 +397,9 @@ class MyAudioPlayer extends HTMLElement {
   initViewers() {
     console.log(this.volume)
     console.log(this.pan)
-    this.shadowRoot.querySelector("#knobVolume").value = this.volume;
-    this.shadowRoot.querySelector("#knobPan").value = this.pan;
+    // this.shadowRoot.querySelector("#knobVolume").value = this.volume;
+    this.shadowRoot.querySelector("#knobVolume").setValue(this.volume);
+    this.shadowRoot.querySelector("#knobPan").setValue(this.pan);
     this.shadowRoot.querySelector("#totalDuration").textContent = this.secondToMinute(this.player.duration);
     this.shadowRoot.querySelector("#loopButton").className = !this.loopBool ? "btn_custom" : "btn_custom_active";
     this.shadowRoot.querySelector("#titleSound").textContent = this.srcString.split("/")[this.srcString.split("/").length - 1];
@@ -663,7 +664,7 @@ class MyAudioPlayer extends HTMLElement {
     this.pannerNode.pan.value = val;
   }
   setControlledVolume(value) {
-    this.shadowRoot.querySelector("#knobVolume").value = value;
+    this.shadowRoot.querySelector("#knobVolume").setValue(this.volume);
     try {
       this.player.volume = value;
     }
@@ -671,7 +672,7 @@ class MyAudioPlayer extends HTMLElement {
   }
   setControlledPan(value) {
     this.pan = value;
-    this.shadowRoot.querySelector("#knobPan").value = value;
+    this.shadowRoot.querySelector("#knobPan").setValue(this.pan);
     try {
       this.pannerNode.pan.value = value;
     }
